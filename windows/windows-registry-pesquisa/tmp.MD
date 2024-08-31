@@ -15,7 +15,6 @@ Os principais arquivos de registro estão localizados na pasta %systemroot%\Syst
 - DEFAULT
 - USERDIFF (usado apenas para upgrades do sistema operacional)
 
-
 ![](2.png)
 *Imagem 1 - Arquivos de registro do Systema*
 
@@ -42,3 +41,81 @@ Embora estaja o nome completo de cada chave raiz no Editor do Registro, também 
 | HKEY_CURRENT_CONFIG | HKCC       |
 
 No geral, embora o Registro do Windows seja um enorme com milhares de valores e códigos, ele é relativamente simples e direto de se trabalhar quando entendemos melhor sua estrutura.
+
+## Práticando
+
+Pesquisando o SID do usuário logado (current user)
+
+![alt text](image.png)
+
+![alt text](image-1.png)
+
+### Manipulando os registro com Python
+
+Foi seguindo o guia [Manipulating Windows Registry using winreg in Python](https://www.geeksforgeeks.org/manipulating-windows-registry-using-winreg-in-python/)
+
+-  #### Adicionando a chave 'DoZeroAoUm' e o valor 'value One' com a informação "Do Zero Ao Um é o Melhor"
+
+
+```python
+import winreg as wrg 
+
+location = wrg.HKEY_CURRENT_USER 
+
+soft = wrg.OpenKeyEx(location, r"SOFTWARE\\") 
+key  = wrg.CreateKey(soft, "DoZeroAoUm") 
+
+wrg.SetValueEx(key, "value One", 0, wrg.REG_SZ, "Do Zero Ao Um é o Melhor") 
+  
+if key: 
+    wrg.CloseKey(key)
+```
+
+![alt text](image-2.png)
+
+
+- #### Lendo a informação do registro
+
+```python
+import winreg as wrg 
+
+location = wrg.HKEY_CURRENT_USER 
+
+soft = wrg.OpenKeyEx(location,r"SOFTWARE\\DoZeroAoUm\\") 
+  
+value = wrg.QueryValueEx(soft,"Value One") 
+  
+if soft: 
+    wrg.CloseKey(soft) 
+  
+print(value)
+```
+
+![alt text](image-3.png)
+
+- #### Deletando o valor 'Value One' da chave 'DoZeroAoUm'
+
+```python
+import winreg as wrg 
+
+location = wrg.HKEY_CURRENT_USER 
+  
+soft = wrg.OpenKeyEx(location, r"SOFTWARE\\") 
+key  = wrg.CreateKey(soft, "DoZeroAoUm") 
+
+del_val = wrg.DeleteValue(key, "Value One") 
+    
+if key: 
+    wrg.CloseKey(key) 
+```
+
+![alt text](image-4.png)
+
+
+## Referências
+
+- Mike Halsey e Andrew Bettany. *Windows Registry Troubleshooting*. Apress, 2013. Capítulo 1: "The Architecture of the Windows Registry".
+  
+- Jerry Honeycutt. *Microsoft Windows Registry Guide*. 2ª edição, Microsoft Press, 2005. Capítulos 1: "Learning the Basics", 2: "Using Registry Editor" e 3: "Backing Up the Registry".
+
+- GeeksforGeeks. "Manipulating Windows Registry using winreg in Python." Acessado em 30 de agosto de 2024. https://www.geeksforgeeks.org/manipulating-windows-registry-using-winreg-in-python/.
